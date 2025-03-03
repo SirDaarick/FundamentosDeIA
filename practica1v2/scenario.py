@@ -120,30 +120,47 @@ class Scenario(tk.Tk):
             self.mother_icon = tk.PhotoImage(width=50, height=50)
     
     def create_grid(self):
-        frame = tk.Frame(self.background_panel)
+        # Crea el frame con el color de fondo adecuado
+        frame = tk.Frame(self.background_panel, bg="SystemButtonFace")  # Ajusta según el color de fondo
         frame.place(x=10, y=10, width=self.dim*50, height=self.dim*50)
         
         for i in range(self.dim):
             for j in range(self.dim):
                 self.matrix[i][j] = 0
-                
-                label = tk.Label(frame, borderwidth=1, relief="solid")
+
+                # Crea un Label con fondo transparente (puede ser un color igual al fondo de la imagen)
+                label = tk.Label(frame, borderwidth=1, relief="solid", bg="SystemButtonFace", highlightthickness=0)
                 label.place(x=j*50, y=i*50, width=50, height=50)
-                
+
+                # Mostrar solo las líneas de la cuadrícula
                 self.grid_labels[i][j] = label
-                #Configura el click para seleccionar una cuadricula
                 label.bind("<Button-1>", self.insert_object)
                 label.bind("<B1-Motion>", self.insert_object)
-    
+                
+                # Si necesitas líneas visibles para la cuadrícula sin fondo, puedes agregarlas aquí.
+
+        
     def insert_object(self, event):
         if self.actual_icon is not None:
-            #Encuentra la cuadricula que fue clickeada
             widget = event.widget
+            # Obtener las coordenadas (x, y) del Label usando place_info()
+            x = int(widget.place_info()["x"])
+            y = int(widget.place_info()["y"])
+            
+            # Calcular las coordenadas (i, j) de la celda
+            i = y // 50  # Cada celda tiene un tamaño de 50x50
+            j = x // 50
+            
+            # Actualizar la matriz si es un obstáculo
+            if self.actual_icon == self.obstacle_icon:
+                self.matrix[i][j] = 1  # Marcar la celda como obstáculo
+            
+            # Colocar el icono en la celda
             widget.config(image=self.actual_icon)
             widget.image = self.actual_icon
-    
+
     def handle_obstacle(self):
- 
+
         if self.selected_option.get() == "obstacle":
             self.actual_icon = self.obstacle_icon
         else:
